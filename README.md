@@ -6,7 +6,7 @@
 
 Приложение доступно по адресу: https://vaercel-deploy-calendar-app.vercel.app/
 
-<img width="1891" height="940" alt="image" src="https://github.com/user-attachments/assets/71e6ca2a-847f-4d5f-9f26-bbddef7659cb" />
+<img width="1123" height="938" alt="image" src="https://github.com/user-attachments/assets/36b3c48f-504a-4b8f-9e45-b3720ef47f43" />
 
 ## Реализованный функционал
 
