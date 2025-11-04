@@ -11,6 +11,7 @@ export type CalendarProps = {
   startDate: Date;
   schedule: ScheduleItem[];
   lessons: Lesson[];
+  slotDuration?: number; // в мин
   onSlotSelect?: (slot: { startTime: Date; endTime: Date }) => void;
 };
 
@@ -19,6 +20,7 @@ const Calendar: React.FC<CalendarProps> = ({
   startDate,
   schedule,
   lessons,
+  slotDuration = 30, // 30 по умолчанию
   onSlotSelect,
 }) => {
   const [currentDate, setCurrentDate] = useState<Date>(startDate);
@@ -42,17 +44,17 @@ const Calendar: React.FC<CalendarProps> = ({
     setDaysInView(days);
   }, [view, currentDate]);
 
-  // Генерируем временные слоты (с 00:00 до 24:00 с шагом 30 минут)
+  // Генерируем временные слоты в зависимости от slotDuration
   const generateTimeSlots = () => {
     const slots = [];
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        slots.push(
-          `${hour.toString().padStart(2, "0")}:${minute
-            .toString()
-            .padStart(2, "0")}`
-        );
-      }
+    const totalMinutes = 24 * 60; // 24 hours in minutes
+    
+    for (let minutes = 0; minutes < totalMinutes; minutes += slotDuration) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      slots.push(
+        `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`
+      );
     }
     return slots;
   };
@@ -127,6 +129,7 @@ const Calendar: React.FC<CalendarProps> = ({
                     <CalendarCell
                       key={`${dayIndex}-${timeIndex}`}
                       slotDate={slotDate}
+                      slotDuration={slotDuration}
                       schedule={schedule}
                       lessons={lessons}
                       onSlotSelect={onSlotSelect}

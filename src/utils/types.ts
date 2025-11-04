@@ -10,13 +10,4 @@ export type Lesson = {
   endTime: string;
   student: string;
 };
-
-export type CalendarProps = {
-  view: "day" | "3days" | "week";
-  startDate: Date;
-  schedule: ScheduleItem[];
-  lessons: Lesson[];
-  onSlotSelect?: (slot: { startTime: Date; endTime: Date }) => void;
-};
-
-// 
+ 

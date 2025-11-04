@@ -3,71 +3,73 @@ import { type Lesson } from '../utils/types';
 
 interface CalendarCellProps {
   slotDate: Date;
+  slotDuration?: number; // в мин (30 мин по умолчанию)
   schedule: any[];
   lessons: Lesson[];
   onSlotSelect?: (slot: { startTime: Date; endTime: Date }) => void;
 }
 
 // Проверяем, находится ли время в расписании преподавателя
-const isInSchedule = (date: Date, schedule: any[]): boolean => {
+const isInSchedule = (date: Date, slotDuration: number, schedule: any[]): boolean => {
+  const slotEnd = new Date(date);
+  slotEnd.setMinutes(slotEnd.getMinutes() + slotDuration);
+  
   return schedule.some(item => {
     const start = new Date(item.startTime);
     const end = new Date(item.endTime);
-    return date >= start && date < end;
+    // Проверяем пересечение слота с расписанием
+    return date < end && slotEnd > start;
   });
 };
 
-// Проверяем, есть ли урок в это время
-const getLessonAtTime = (date: Date, lessons: Lesson[]): Lesson | null => {
+// Проверяем, есть ли урок, который пересекается с этим слотом
+const getLessonAtTime = (date: Date, slotDuration: number, lessons: Lesson[]): Lesson | null => {
+  const slotEnd = new Date(date);
+  slotEnd.setMinutes(slotEnd.getMinutes() + slotDuration);
+  
   return lessons.find(lesson => {
-    const start = new Date(lesson.startTime);
-    const end = new Date(lesson.endTime);
-    // Проверяем, начинается ли урок в этом временном слоте
-    const slotStart = new Date(date);
-    const slotEnd = new Date(date);
-    slotEnd.setMinutes(slotEnd.getMinutes() + 30);
-    
-    // Урок пересекается со слотом, если:
-    // 1. Время начала урока находится в слоте (включая начало, исключая конец)
-    // 2. Время начала слота находится в уроке
-    return (start >= slotStart && start < slotEnd) || 
-           (slotStart >= start && slotStart < end);
+    const lessonStart = new Date(lesson.startTime);
+    const lessonEnd = new Date(lesson.endTime);
+    // Проверяем пересечение слота с уроком
+    return date < lessonEnd && slotEnd > lessonStart;
   }) || null;
 };
 
-// Проверяем, является ли это время началом урока
-const isLessonStart = (date: Date, lessons: Lesson[]): boolean => {
+// Проверяем, является ли это время началом урока (учитывая продолжительность слота)
+const isLessonStart = (date: Date, slotDuration: number, lessons: Lesson[]): boolean => {
   return lessons.some(lesson => {
-    const start = new Date(lesson.startTime);
-    const slotStart = new Date(date);
-    // Урок начинается в этом слоте, если время начала урока совпадает с началом слота
-    return start.getTime() === slotStart.getTime();
+    const lessonStart = new Date(lesson.startTime);
+    const slotEnd = new Date(date);
+    slotEnd.setMinutes(slotEnd.getMinutes() + slotDuration);
+    
+    // Урок начинается в этом слоте, если время начала урока находится в слоте
+    return lessonStart >= date && lessonStart <= slotEnd;
   });
 };
 
-// Получаем продолжительность урока в слотах (30-минутных интервалах)
-const getLessonSlotSpan = (lesson: Lesson): number => {
+// Получаем продолжительность урока в слотах
+const getLessonSlotSpan = (lesson: Lesson, slotDuration: number): number => {
   const start = new Date(lesson.startTime);
   const end = new Date(lesson.endTime);
   const diffMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
-  // Округляем до ближайшего целого числа слотов (каждый слот = 30 минут)
-  return Math.max(1, Math.round(diffMinutes / 30));
+  // Округляем до ближайшего целого числа слотов
+  return Math.max(1, Math.ceil(diffMinutes / slotDuration));
 };
 
 // Определяем стиль для слота
-const getSlotStyle = (date: Date, schedule: any[], lessons: Lesson[]) => {
-  const lesson = getLessonAtTime(date, lessons);
+const getSlotStyle = (date: Date, slotDuration: number, schedule: any[], lessons: Lesson[]) => {
+  const lesson = getLessonAtTime(date, slotDuration, lessons);
   
   if (lesson) {
     // Если это начало урока, показываем его как забронированный слот
-    if (isLessonStart(date, lessons)) {
+    if (isLessonStart(date, slotDuration, lessons)) {
       return "bg-red-300 cursor-pointer hover:bg-red-400";
     }
     // Если это продолжение урока, скрываем его
     return "hidden";
   }
   
-  if (isInSchedule(date, schedule)) {
+  if (isInSchedule(date, slotDuration, schedule)) {
     return "bg-green-200 cursor-pointer hover:bg-green-300";
   }
   
@@ -76,17 +78,18 @@ const getSlotStyle = (date: Date, schedule: any[], lessons: Lesson[]) => {
 
 const CalendarCell: React.FC<CalendarCellProps> = ({
   slotDate,
+  slotDuration = 30, // Default to 30 minutes
   schedule,
   lessons,
   onSlotSelect
 }) => {
   const slotEndDate = new Date(slotDate);
-  slotEndDate.setMinutes(slotEndDate.getMinutes() + 30);
+  slotEndDate.setMinutes(slotEndDate.getMinutes() + slotDuration);
   
-  const lesson = getLessonAtTime(slotDate, lessons);
-  const isStart = isLessonStart(slotDate, lessons);
-  const slotSpan = lesson ? getLessonSlotSpan(lesson) : 1;
-  const slotStyle = getSlotStyle(slotDate, schedule, lessons);
+  const lesson = getLessonAtTime(slotDate, slotDuration, lessons);
+  const isStart = isLessonStart(slotDate, slotDuration, lessons);
+  const slotSpan = lesson ? getLessonSlotSpan(lesson, slotDuration) : 1;
+  const slotStyle = getSlotStyle(slotDate, slotDuration, schedule, lessons);
   
   // Если это продолжение урока, не рендерим ничего
   if (lesson && !isStart) {
@@ -96,8 +99,8 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
   // Обработчик нажатия на слот
   const handleSlotClick = () => {
     // Проверяем, что слот находится в расписании преподавателя и не пересекается с уроком
-    if (onSlotSelect && isInSchedule(slotDate, schedule)) {
-      const lesson = getLessonAtTime(slotDate, lessons);
+    if (onSlotSelect && isInSchedule(slotDate, slotDuration, schedule)) {
+      const lesson = getLessonAtTime(slotDate, slotDuration, lessons);
       if (!lesson) {
         onSlotSelect({ startTime: slotDate, endTime: slotEndDate });
       }
@@ -110,7 +113,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
       onClick={() => {
         if (lesson) {
           alert(`Урок с ${new Date(lesson.startTime).toLocaleString()} по ${new Date(lesson.endTime).toLocaleString()}\nСтудент: ${lesson.student}\nДлительность: ${lesson.duration} минут`);
-        } else if (isInSchedule(slotDate, schedule)) {
+        } else if (isInSchedule(slotDate, slotDuration, schedule)) {
           handleSlotClick();
         }
       }}
@@ -120,7 +123,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
       } : {}}
     >
       {isStart && lesson && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-2 bg rounded shadow">
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-2 rounded shadow">
           <div className="text-xs font-bold text-white text-center">
             <div className="font-bold truncate px-1">{lesson.student}</div>
             <div>{lesson.duration} мин</div>

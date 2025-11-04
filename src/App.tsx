@@ -1,71 +1,12 @@
 import { useState, useEffect } from "react";
 import Calendar from "./components/Calendar";
-import { type ScheduleItem, type Lesson } from "./utils/types";
+import { lessons, schedule } from "./utils/data";
 
 function App() {
   const [view, setView] = useState<"day" | "3days" | "week">("week");
+  const [slotDuration, setSlotDuration] = useState<number>(30); // по умолчанию фикусруем 30 мин
   const [startDate] = useState<Date>(new Date("2025-08-23T00:00:00Z"));
 
-  // Пример расписания преподавателя
-  const schedule: ScheduleItem[] = [
-    {
-      startTime: "2025-08-23T22:30:00+00:00",
-      endTime: "2025-08-24T02:29:59+00:00",
-    },
-    {
-      startTime: "2025-08-25T01:30:00+00:00",
-      endTime: "2025-08-25T04:59:59+00:00",
-    },
-    {
-      startTime: "2025-08-25T11:00:00+00:00",
-      endTime: "2025-08-25T19:29:59+00:00",
-    },
-    {
-      startTime: "2025-08-27T02:30:00+00:00",
-      endTime: "2025-08-27T06:59:59+00:00",
-    },
-    {
-      startTime: "2025-08-28T23:00:00+00:00",
-      endTime: "2025-08-29T08:29:59+00:00",
-    },
-    {
-      startTime: "2025-08-30T22:30:00+00:00",
-      endTime: "2025-08-31T02:29:59+00:00",
-    },
-    {
-      startTime: "2025-09-01T01:30:00+00:00",
-      endTime: "2025-09-01T04:59:59+00:00",
-    },
-    {
-      startTime: "2025-09-01T11:00:00+00:00",
-      endTime: "2025-09-01T19:29:59+00:00",
-    },
-  ];
-
-  // Пример уроков
-  const lessons: Lesson[] = [
-    {
-      id: 52,
-      duration: 60,
-      startTime: "2025-08-25T13:30:00+00:00",
-      endTime: "2025-08-25T14:29:59+00:00",
-      student: "Алексей",
-    },
-    {
-      id: 53,
-      duration: 30,
-      startTime: "2025-08-25T15:00:00+00:00",
-      endTime: "2025-08-25T15:29:59+00:00",
-      student: "Мария",
-    },
-    {
-      id: 54,
-      duration: 90,
-      startTime: "2025-08-27T03:30:00+00:00",
-      endTime: "2025-08-27T04:59:59+00:00",
-      student: "Иван",
-    },
-  ];
 
   // Обработчик выбора слота
   const handleSlotSelect = (slot: { startTime: Date; endTime: Date }) => {
@@ -96,6 +37,12 @@ function App() {
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Обработчик изменения продолжительности слота
+  const handleDurationChange = (duration: number) => {
+    setSlotDuration(duration);
+  };
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 py-8">
@@ -146,11 +93,52 @@ function App() {
             </div>
           </div>
 
+          {/* Контролы для настройки продолжительности слота */}
+          <div className="slot-duration-controls text-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">
+              Настройка продолжительности слотов
+            </h2>
+            <div className="flex flex-wrap justify-center gap-2 mb-3">
+              <button
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  slotDuration === 30
+                    ? "bg-green-600 text-white shadow-md"
+                    : "bg-green-100 text-green-800 hover:bg-green-200"
+                }`}
+                onClick={() => handleDurationChange(30)}
+              >
+                30 минут
+              </button>
+              <button
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  slotDuration === 60
+                    ? "bg-green-600 text-white shadow-md"
+                    : "bg-green-100 text-green-800 hover:bg-green-200"
+                }`}
+                onClick={() => handleDurationChange(60)}
+              >
+                60 минут
+              </button>
+              <button
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  slotDuration === 90
+                    ? "bg-green-600 text-white shadow-md"
+                    : "bg-green-100 text-green-800 hover:bg-green-200"
+                }`}
+                onClick={() => handleDurationChange(90)}
+              >
+                90 минут
+              </button>
+            </div>
+          
+          </div>
+
           <Calendar
             view={view}
             startDate={startDate}
             schedule={schedule}
             lessons={lessons}
+            slotDuration={slotDuration}
             onSlotSelect={handleSlotSelect}
           />
         </div>
