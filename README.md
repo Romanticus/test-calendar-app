@@ -1,73 +1,123 @@
-# React + TypeScript + Vite
+# Календарь 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Интерактивное веб-приложение календаря для отображения расписания с возможностью бронирования времени. Проект реализован на React с TypeScript и TailwindCSS, использует современные подходы к разработке и адаптивный дизайн.
 
-Currently, two official plugins are available:
+## Демонстрация
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Приложение доступно по адресу: https://vaercel-deploy-calendar-app.vercel.app/
 
-## React Compiler
+## Реализованный функционал
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Основные возможности:
+- Отображение расписания в виде таблицы с 30-минутными слотами
+- Различные режимы просмотра:
+  - Недельный вид (7 дней) для десктопа
+  - Трехдневный и однодневный виды для мобильных устройств
+- Интерактивная навигация с кнопками "Назад" и "Вперед"
+- Цветовая кодировка слотов:
+  - Белый: недоступное время (вне расписания)
+  - Светло-зеленый: доступное время для бронирования
+  - Красный: забронированные уроки
+- Возможность настройки продолжительности временных слотов (30, 60, 90 минут)
+- Адаптивный дизайн, корректно работающий на устройствах с разными размерами экранов
 
-## Expanding the ESLint configuration
+### Интерактивные элементы:
+- Клик по доступному слоту вызывает обработчик бронирования
+- Клик по забронированному уроку показывает информацию о студенте и продолжительности
+- Плавные анимации при наведении на интерактивные элементы
+- Sticky-заголовки для удобной навигации по длинному календарю
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Технические особенности:
+- Компонентный подход с разделением логики на отдельные модули
+- TypeScript для строгой типизации и предотвращения ошибок
+- TailwindCSS для стилизации без использования отдельных CSS-файлов
+- Оптимизированная работа с датами и временными интервалами
+- Эффективное использование CSS Grid для создания таблицы
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Стек технологий
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Фронтенд**: React 19, TypeScript, TailwindCSS
+- **Сборка**: Vite 7
+- **Линтинг**: ESLint
+- **Типизация**: @types/react, @types/node
+- **Утилиты**: date-fns (для работы с датами)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Структура проекта
+
+```
+src/
+├── components/
+│   ├── Calendar.tsx          # Основной компонент календаря
+│   ├── CalendarCell.tsx      # Компонент ячейки календаря
+│   ├── CalendarHeader.tsx    # Заголовок с навигацией
+│   ├── DayHeader.tsx         # Заголовок дня
+│   └── TimeSlot.tsx          # Компонент временного слота
+├── utils/
+│   ├── types.ts             # Типы данных TypeScript
+│   └── utils.ts             # Вспомогательные функции
+├── App.tsx                  # Корневой компонент приложения
+├── main.tsx                 # Точка входа в приложение
+└── index.css                # Базовые стили TailwindCSS
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Установка и запуск
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Системные требования:
+- Node.js версии 18 или выше
+- npm, yarn или pnpm
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Запуск проекта:
+
+1. Установка зависимостей:
+```bash
+npm install
 ```
+
+2. Запуск в режиме разработки:
+```bash
+npm run dev
+```
+
+3. Сборка для продакшена:
+```bash
+npm run build
+```
+
+4. Просмотр собранной версии:
+```bash
+npm run preview
+```
+
+## Особенности реализации
+
+### Работа с временными интервалами
+- Точное определение пересечений между слотами и уроками
+- Корректное отображение уроков продолжительностью 30, 60 и 90 минут
+- Обработка случаев, когда уроки не выравнены по границам слотов
+
+### Адаптивность
+- Автоматическое переключение между режимами просмотра в зависимости от ширины экрана
+- Горизонтальная прокрутка для мобильных устройств при необходимости
+- Отзывчивые стили через TailwindCSS
+
+### Оптимизация производительности
+- Минимизация перерисовок компонентов
+- Эффективное использование React.memo и useMemo где это применимо
+- Ленивая загрузка компонентов
+
+## Как можно улучшить проект:
+
+- Добавить возможность создания и редактирования уроков через UI 
+- Интеграция с бэкендом для хранения данных
+- Добавить темную тему и возможность переключения между темами
+- Создание полноценного планировщика с возможностью экспорта в календари
+
+
+## Результаты
+
+Благодаря разработке этого проекта была получена практика в:
+- Создании сложных UI-компонентов с использованием CSS Grid
+- Работе с датами и временными интервалами в JavaScript/TypeScript
+- Применении современных подходов к компонентной архитектуре React
+- Использовании TailwindCSS для быстрой и согласованной стилизации
+- Разработке адаптивных интерфейсов для различных устройств
