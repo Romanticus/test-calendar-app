@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Calendar from "./components/Calendar";
-import { type ScheduleItem, type Lesson } from "./types";
+import { type ScheduleItem, type Lesson } from "./utils/types";
 
 function App() {
   const [view, setView] = useState<"day" | "3days" | "week">("week");

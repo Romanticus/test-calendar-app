@@ -1,9 +1,14 @@
 import React from 'react';
-import { formatDate, getDayName } from './Calendar';
+import { formatDate} from '../utils/utils';
 
 interface DayHeaderProps {
   day: Date;
 }
+
+const getDayName = (date: Date): string => {
+  const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+  return days[date.getDay()];
+};
 
 const DayHeader: React.FC<DayHeaderProps> = ({ day }) => {
   return (
