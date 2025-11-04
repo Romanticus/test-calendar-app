@@ -34,6 +34,21 @@ export const isTimeOverlap = (
   return start1 < end2 && start2 < end1;
 };
 
+ // Получаем название дня недели
+ export const getDayName = (date: Date): string => {
+    const days = [
+      "Понедельник",
+      "Вторник",
+      "Среда",
+      "Четверг",
+      "Пятница",
+      "Суббота",
+      "Воскресенье",
+    ];
+    return days[date.getDay()];
+  };
+
+
 const Calendar: React.FC<CalendarProps> = ({
   view,
   startDate,
@@ -140,19 +155,7 @@ const Calendar: React.FC<CalendarProps> = ({
 
   const timeSlots = generateTimeSlots();
 
-  // Получаем название дня недели
-  const getDayName = (date: Date): string => {
-    const days = [
-      "Понедельник",
-      "Вторник",
-      "Среда",
-      "Четверг",
-      "Пятница",
-      "Суббота",
-      "Воскресенье",
-    ];
-    return days[date.getDay()];
-  };
+ 
 
   // Навигация
   const goToPrevious = () => {
@@ -224,8 +227,6 @@ const Calendar: React.FC<CalendarProps> = ({
               <DayHeader
                 key={index}
                 day={day}
-                getDayName={getDayName}
-                formatDate={formatDate}
               />
             ))}
 

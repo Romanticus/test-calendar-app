@@ -101,7 +101,7 @@ function App() {
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-center mb-2 text-blue-900">
-          Календарь преподавателя
+          Календарь 
         </h1>
         <p className="text-center text-blue-700 mb-6">
           Расписание занятий и доступное время для бронирования
