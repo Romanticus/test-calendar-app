@@ -103,7 +103,7 @@ const Calendar: React.FC<CalendarProps> = ({
             }}
           >
             {/* Верхний левый угол (пустая ячейка) */}
-            <div className="border border-gray-300 p-3 min-h-12 bg-blue-300 text-white font-bold sticky top-0 left-0 z-10"></div>
+            <div className="border sticky border-gray-300 p-3 min-h-12 bg-blue-300 text-white font-bold top-0 left-0 z-21"></div>
 
             {/* Заголовки дней */}
             {daysInView.map((day, index) => (
